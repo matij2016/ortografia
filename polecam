@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🍯 Pszczółka Ortograficzna - Ultimate Edition</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="kontener">
+    
+    <!-- ========== EKRAN STARTOWY ========== -->
+    <div id="ekran-start" class="ekran">
+      <div class="logo">🐝</div>
+      <h1>Pszczółka Ortograficzna</h1>
+      <p class="podtytul">Ultimate Edition 🌟</p>
+      
+      <div class="panel-start">
+        <h3>📚 Wybierz poziom trudności:</h3>
+        <button onclick="startGry(1)" class="btn-poziom easy">
+          🟢 ŁATWY<br><span>Proste słowa</span>
+        </button>
+        <button onclick="startGry(2)" class="btn-poziom medium">
+          🟡 ŚREDNI<br><span>Trudniejsze zasady</span>
+        </button>
+        <button onclick="startGry(3)" class="btn-poziom hard">
+          🔴 TRUDNY<br><span>Mistrzowski poziom</span>
+        </button>
+      </div>
+
+      <div class="instrukcja">
+        <h3>🎮 Jak grać?</h3>
+        <ul>
+          <li>✅ Za każdą dobrą odpowiedź: <strong>1 miód 🍯</strong></li>
+          <li>🃏 Wybieraj karty z ulepszeniami!</li>
+          <li>⚡ Uważaj na eventy!</li>
+          <li>🐾 Zbieraj zwierzątka z bonusami!</li>
+          <li>❤️ Masz 3 życia - uważaj!</li>
+        </ul>
+
+        <div class="legenda">
+          <h4>🐾 Zwierzątka:</h4>
+          <div class="zwierzatka-info">
+            <div>🐕 Pies: +2 życia</div>
+            <div>🐱 Kot: 75% na 500 miodu</div>
+            <div>🦔 Pancernik: -50% kar</div>
+            <div>🐝 Pszczółka: 20 miodu/s</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== EKRAN GRY ========== -->
+    <div id="ekran-gra" class="ekran ukryty">
+      
+      <!-- Pasek górny -->
+      <div class="pasek-gorny">
+        <div class="miod-display">
+          🍯 <span id="miod-liczba">0</span>
+          <span id="pszczolka-zarobek" class="pszczolka-zarobek ukryty">
+            +<span id="pszczolka-bonus">0</span>/s
+          </span>
+        </div>
+        <div class="pytanie-nr">
+          Pytanie <span id="nr-pytania">1</span>/10
+        </div>
+        <div class="seria">
+          🔥 <span id="seria">0</span>
+        </div>
+      </div>
+
+      <!-- Życia -->
+      <div class="zycia-panel">
+        <span id="zycia-display">❤️❤️❤️</span>
+      </div>
+
+      <!-- Event aktywny -->
+      <div id="event-banner" class="event-banner ukryty">
+        <span id="event-ikona"></span>
+        <span id="event-nazwa"></span>
+      </div>
+
+      <!-- Zwierzątka -->
+      <div id="zwierzatka-panel" class="zwierzatka-panel ukryty">
+        <div class="zwierzatka-tytul">🐾 Twoje zwierzątka:</div>
+        <div id="zwierzatka-lista"></div>
+      </div>
+
+      <!-- Pasek postępu -->
+      <div class="pasek-postepu">
+        <div id="pasek-fill"></div>
+      </div>
+
+      <!-- Kontener pytania -->
+      <div id="pytanie-kontener" class="pytanie-kontener">
+        <h2 id="pytanie-tekst"></h2>
+        <div id="opcje-kontener"></div>
+      </div>
+
+      <!-- Feedback -->
+      <div id="feedback" class="feedback ukryty">
+        <div id="feedback-ikona"></div>
+        <p id="feedback-tekst"></p>
+        <p id="feedback-szczegoly"></p>
+        <p id="feedback-zasada"></p>
+        <button id="btn-dalej" class="btn-dalej">Dalej ➡️</button>
+      </div>
+    </div>
+
+    <!-- ========== EKRAN WYBORU KARTY ========== -->
+    <div id="ekran-karty" class="ekran ukryty">
+      <div class="karty-header">
+        <h2>🎴 Wybierz swoją kartę!</h2>
+        <p>Kliknij na jedną z kart, aby zobaczyć efekt</p>
+      </div>
+
+      <div class="karty-kontener" id="karty-kontener">
+        <!-- Karty generowane w JS -->
+      </div>
+
+      <div id="efekt-karty" class="efekt-karty ukryty">
+        <div class="efekt-animacja"></div>
+        <h3 id="efekt-tytul"></h3>
+        <p id="efekt-opis"></p>
+        <button onclick="zakonczKarte()" class="btn-dalej">Kontynuuj ➡️</button>
+      </div>
+    </div>
+
+    <!-- ========== EKRAN ZWIERZĄTKA ========== -->
+    <div id="ekran-zwierze" class="ekran ukryty">
+      <div class="zwierze-header">
+        <h2>✨ ZŁOTA ODPOWIEDŹ! ✨</h2>
+        <p>Zdobywasz nowego towarzysza!</p>
+      </div>
+
+      <div class="zwierze-wyswietlanie">
+        <div class="zwierze-ikona" id="zwierze-ikona">🐕</div>
+        <h3 id="zwierze-nazwa">Pies</h3>
+        <p id="zwierze-opis">Daje +2 życia!</p>
+      </div>
+
+      <button onclick="zakonczZwierze()" class="btn-dalej">Zabierz ze sobą! 🎉</button>
+    </div>
+
+    <!-- ========== EKRAN KOŃCOWY ========== -->
+    <div id="ekran-koniec" class="ekran ukryty">
+      <div class="koniec-header">
+        <div class="trofeum">🏆</div>
+        <h1 id="koniec-tytul">Gratulacje!</h1>
+      </div>
+
+      <div class="statystyki">
+        <div class="stat-box miod-box">
+          <div class="stat-ikona">🍯</div>
+          <div class="stat-wartosc" id="koniec-miod">0</div>
+          <div class="stat-opis">Zebrany miód</div>
+        </div>
+
+        <div class="stat-box">
+          <div class="stat-ikona">✅</div>
+          <div class="stat-wartosc" id="koniec-poprawne">0</div>
+          <div class="stat-opis">Poprawne</div>
+        </div>
+
+        <div class="stat-box">
+          <div class="stat-ikona">🔥</div>
+          <div class="stat-wartosc" id="koniec-seria">0</div>
+          <div class="stat-opis">Najdłuższa seria</div>
+        </div>
+
+        <div class="stat-box">
+          <div class="stat-ikona">🐾</div>
+          <div class="stat-wartosc" id="koniec-zwierzatka">0</div>
+          <div class="stat-opis">Zwierzątka</div>
+        </div>
+      </div>
+
+      <div id="koniec-zwierzatka-lista" class="koniec-zwierzatka ukryty">
+        <h3>🐾 Zebrane zwierzątka:</h3>
+        <div id="koniec-zwierzatka-ikonki"></div>
+      </div>
+
+      <div class="osiagniecia">
+        <h3>🏅 Twoje osiągnięcia:</h3>
+        <div id="osiagniecia-lista"></div>
+      </div>
+
+      <button onclick="location.reload()" class="btn-restart">
+        🔄 Zagraj ponownie
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Cząsteczki -->
+  <div id="particles"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🍯 Pszczółka Ortograficzna - Ultimate Edition</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="kontener">
+    
+    <!-- ========== EKRAN STARTOWY ========== -->
+    <div id="ekran-start" class="ekran">
+      <div class="logo">🐝</div>
+      <h1>Pszczółka Ortograficzna</h1>
+      <p class="podtytul">Ultimate Edition 🌟</p>
+      
+      <div class="panel-start">
+        <h3>📚 Wybierz poziom trudności:</h3>
+        <button onclick="startGry(1)" class="btn-poziom easy">
+          🟢 ŁATWY<br><span>Proste słowa</span>
+        </button>
+        <button onclick="startGry(2)" class="btn-poziom medium">
+          🟡 ŚREDNI<br><span>Trudniejsze zasady</span>
+        </button>
+        <button onclick="startGry(3)" class="btn-poziom hard">
+          🔴 TRUDNY<br><span>Mistrzowski poziom</span>
+        </button>
+      </div>
+
+      <div class="instrukcja">
+        <h3>🎮 Jak grać?</h3>
+        <ul>
+          <li>✅ Za każdą dobrą odpowiedź: <strong>1 miód 🍯</strong></li>
+          <li>🃏 Wybieraj karty z ulepszeniami!</li>
+          <li>⚡ Uważaj na eventy!</li>
+          <li>🐾 Zbieraj zwierzątka z bonusami!</li>
+          <li>❤️ Masz 3 życia - uważaj!</li>
+        </ul>
+
+        <div class="legenda">
+          <h4>🐾 Zwierzątka:</h4>
+          <div class="zwierzatka-info">
+            <div>🐕 Pies: +2 życia</div>
+            <div>🐱 Kot: 75% na 500 miodu</div>
+            <div>🦔 Pancernik: -50% kar</div>
+            <div>🐝 Pszczółka: 20 miodu/s</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== EKRAN GRY ========== -->
+    <div id="ekran-gra" class="ekran ukryty">
+      
+      <!-- Pasek górny -->
+      <div class="pasek-gorny">
+        <div class="miod-display">
+          🍯 <span id="miod-liczba">0</span>
+          <span id="pszczolka-zarobek" class="pszczolka-zarobek ukryty">
+            +<span id="pszczolka-bonus">0</span>/s
+          </span>
+        </div>
+        <div class="pytanie-nr">
+          Pytanie <span id="nr-pytania">1</span>/10
+        </div>
+        <div class="seria">
+          🔥 <span id="seria">0</span>
+        </div>
+      </div>
+
+      <!-- Życia -->
+      <div class="zycia-panel">
+        <span id="zycia-display">❤️❤️❤️</span>
+      </div>
+
+      <!-- Event aktywny -->
+      <div id="event-banner" class="event-banner ukryty">
+        <span id="event-ikona"></span>
+        <span id="event-nazwa"></span>
+      </div>
+
+      <!-- Zwierzątka -->
+      <div id="zwierzatka-panel" class="zwierzatka-panel ukryty">
+        <div class="zwierzatka-tytul">🐾 Twoje zwierzątka:</div>
+        <div id="zwierzatka-lista"></div>
+      </div>
+
+      <!-- Pasek postępu -->
+      <div class="pasek-postepu">
+        <div id="pasek-fill"></div>
+      </div>
+
+      <!-- Kontener pytania -->
+      <div id="pytanie-kontener" class="pytanie-kontener">
+        <h2 id="pytanie-tekst"></h2>
+        <div id="opcje-kontener"></div>
+      </div>
+
+      <!-- Feedback -->
+      <div id="feedback" class="feedback ukryty">
+        <div id="feedback-ikona"></div>
+        <p id="feedback-tekst"></p>
+        <p id="feedback-szczegoly"></p>
+        <p id="feedback-zasada"></p>
+        <button id="btn-dalej" class="btn-dalej">Dalej ➡️</button>
+      </div>
+    </div>
+
+    <!-- ========== EKRAN WYBORU KARTY ========== -->
+    <div id="ekran-karty" class="ekran ukryty">
+      <div class="karty-header">
+        <h2>🎴 Wybierz swoją kartę!</h2>
+        <p>Kliknij na jedną z kart, aby zobaczyć efekt</p>
+      </div>
+
+      <div class="karty-kontener" id="karty-kontener">
+        <!-- Karty generowane w JS -->
+      </div>
+
+      <div id="efekt-karty" class="efekt-karty ukryty">
+        <div class="efekt-animacja"></div>
+        <h3 id="efekt-tytul"></h3>
+        <p id="efekt-opis"></p>
+        <button onclick="zakonczKarte()" class="btn-dalej">Kontynuuj ➡️</button>
+      </div>
+    </div>
+
+    <!-- ========== EKRAN ZWIERZĄTKA ========== -->
+    <div id="ekran-zwierze" class="ekran ukryty">
+      <div class="zwierze-header">
+        <h2>✨ ZŁOTA ODPOWIEDŹ! ✨</h2>
+        <p>Zdobywasz nowego towarzysza!</p>
+      </div>
+
+      <div class="zwierze-wyswietlanie">
+        <div class="zwierze-ikona" id="zwierze-ikona">🐕</div>
+        <h3 id="zwierze-nazwa">Pies</h3>
+        <p id="zwierze-opis">Daje +2 życia!</p>
+      </div>
+
+      <button onclick="zakonczZwierze()" class="btn-dalej">Zabierz ze sobą! 🎉</button>
+    </div>
+
+    <!-- ========== EKRAN KOŃCOWY ========== -->
+    <div id="ekran-koniec" class="ekran ukryty">
+      <div class="koniec-header">
+        <div class="trofeum">🏆</div>
+        <h1 id="koniec-tytul">Gratulacje!</h1>
+      </div>
+
+      <div class="statystyki">
+        <div class="stat-box miod-box">
+          <div class="stat-ikona">🍯</div>
+          <div class="stat-wartosc" id="koniec-miod">0</div>
+          <div class="stat-opis">Zebrany miód</div>
+        </div>
+
+        <div class="stat-box">
+          <div class="stat-ikona">✅</div>
+          <div class="stat-wartosc" id="koniec-poprawne">0</div>
+          <div class="stat-opis">Poprawne</div>
+        </div>
+
+        <div class="stat-box">
+          <div class="stat-ikona">🔥</div>
+          <div class="stat-wartosc" id="koniec-seria">0</div>
+          <div class="stat-opis">Najdłuższa seria</div>
+        </div>
+
+        <div class="stat-box">
+          <div class="stat-ikona">🐾</div>
+          <div class="stat-wartosc" id="koniec-zwierzatka">0</div>
+          <div class="stat-opis">Zwierzątka</div>
+        </div>
+      </div>
+
+      <div id="koniec-zwierzatka-lista" class="koniec-zwierzatka ukryty">
+        <h3>🐾 Zebrane zwierzątka:</h3>
+        <div id="koniec-zwierzatka-ikonki"></div>
+      </div>
+
+      <div class="osiagniecia">
+        <h3>🏅 Twoje osiągnięcia:</h3>
+        <div id="osiagniecia-lista"></div>
+      </div>
+
+      <button onclick="location.reload()" class="btn-restart">
+        🔄 Zagraj ponownie
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Cząsteczki -->
+  <div id="particles"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
