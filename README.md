@@ -1,190 +1,221 @@
-import random
-import math
-import time
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gra Ortograficzna</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #fce4ec; text-align: center; margin: 0; padding: 20px; }
+        #game-box { background: white; max-width: 600px; margin: 0 auto; padding: 20px; border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        h1 { color: #d81b60; }
+        .stats { display: flex; justify-content: space-around; background: #fff176; padding: 10px; border-radius: 10px; font-weight: bold; margin-bottom: 20px; }
+        .btn { background: #4CAF50; color: white; border: none; padding: 15px 20px; margin: 10px; font-size: 16px; border-radius: 10px; cursor: pointer; }
+        .btn:hover { background: #45a049; }
+        .card-btn { background: #9c27b0; }
+        .card-btn:hover { background: #7b1fa2; }
+        #message-board { font-size: 18px; min-height: 100px; margin-bottom: 20px; color: #333; font-weight: bold;}
+        #pets { font-size: 14px; color: #555; margin-top: 10px; }
+    </style>
+</head>
+<body>
 
-# --- STATYSTYKI GRACZA ---
-miod = 0
-miod_za_odpowiedz = 10
-poprawne_odpowiedzi = 0
-zadane_pytania = 0  # Nowy licznik do zmiany etapów!
-zycia = 3
-punkty_ujemne = 0
-
-# --- ZWIERZAKI ---
-posiadane_zwierzaki = []
-ilosc_pszczolek = 0
-ostatni_czas = time.time()
-
-# --- BAZA PYTAŃ PODZIELONA NA KATEGORIE ---
-baza_pytan = {
-    "Ó czy U": [
-        {"pytanie": "Jak napiszesz: 1. góra, czy 2. gura?", "odpowiedz": "1"},
-        {"pytanie": "Jak napiszesz: 1. pszczułka, czy 2. pszczółka?", "odpowiedz": "2"},
-        {"pytanie": "Jak napiszesz: 1. ulu, czy 2. óló?", "odpowiedz": "1"},
-        {"pytanie": "Jak napiszesz: 1. głuwna, czy 2. główna?", "odpowiedz": "2"}
-    ],
-    "RZ czy Ż": [
-        {"pytanie": "Jak napiszesz: 1. rzeka, czy 2. żeka?", "odpowiedz": "1"},
-        {"pytanie": "Jak napiszesz: 1. rzaba, czy 2. żaba?", "odpowiedz": "2"},
-        {"pytanie": "Jak napiszesz: 1. zwierzę, czy 2. zwieżę?", "odpowiedz": "1"},
-        {"pytanie": "Jak napiszesz: 1. jeźeli, czy 2. jeżeli?", "odpowiedz": "2"}
-    ],
-    "CH czy H": [
-        {"pytanie": "Jak napiszesz: 1. chmura, czy 2. hmura?", "odpowiedz": "1"},
-        {"pytanie": "Jak napiszesz: 1. herbata, czy 2. cherbata?", "odpowiedz": "1"},
-        {"pytanie": "Jak napiszesz: 1. bohater, czy 2. bochater?", "odpowiedz": "1"},
-        {"pytanie": "Jak napiszesz: 1. chleb, czy 2. hleb?", "odpowiedz": "1"}
-    ],
-    "Miękkie: Ś, Ź, Ć, Ń": [
-        {"pytanie": "Jak napiszesz: 1. mroziny, czy 2. mroźny?", "odpowiedz": "2"},
-        {"pytanie": "Jak napiszesz: 1. odpowiedź, czy 2. otpowiedź?", "odpowiedz": "1"},
-        {"pytanie": "Jak napiszesz: 1. słońce, czy 2. słonice?", "odpowiedz": "1"},
-        {"pytanie": "Jak napiszesz: 1. ćma, czy 2. ciema?", "odpowiedz": "1"}
-    ]
-}
-
-kategorie = list(baza_pytan.keys())
-poprzednia_kategoria = ""
-
-def zarobek_pszczolek():
-    global miod, ostatni_czas, ilosc_pszczolek
-    if ilosc_pszczolek > 0:
-        czas_teraz = time.time()
-        minione_sekundy = int(czas_teraz - ostatni_czas)
-        zarobiony_miod = minione_sekundy * (20 * ilosc_pszczolek)
-        if zarobiony_miod > 0:
-            miod += zarobiony_miod
-            print(f"🐝 Twoje pszczółki zarobiły dla Ciebie +{zarobiony_miod} miodu w {minione_sekundy} sekund!")
-        ostatni_czas = czas_teraz
-    else:
-        ostatni_czas = time.time()
-
-def losuj_zwierzatko():
-    global zycia, miod, ilosc_pszczolek
-    zwierzaki = ["Pies", "Kot", "Pancernik", "Pszczółka"]
-    wylosowany = random.choice(zwierzaki)
-    posiadane_zwierzaki.append(wylosowany)
+<div id="game-box">
+    <h1>🍯 Gra Ortograficzna! 🐻</h1>
     
-    print(f"\n✨ ZŁOTA ODPOWIEDŹ! Otrzymujesz zwierzaka: {wylosowany.upper()}! ✨")
-    
-    if wylosowany == "Pies":
-        zycia += 2
-        print("🐶 Pies dodaje Ci +2 życia!")
-    elif wylosowany == "Kot":
-        if random.random() <= 0.75:
-            miod += 500
-            print("🐱 Kot przyniósł Ci szczęście! Dostajesz +500 miodu!")
-        else:
-            print("🐱 Kot poszedł spać. Tym razem nie ma miodu.")
-    elif wylosowany == "Pancernik":
-        print("🦔 Pancernik dołącza do drużyny! Chroni przed 50% punktów ujemnych!")
-    elif wylosowany == "Pszczółka":
-        ilosc_pszczolek += 1
-        print("🐝 Pszczółka dołącza do ula! Produkuje 20 miodu na sekundę!")
+    <div class="stats">
+        <span id="stat-miod">🍯 Miód: 0</span>
+        <span id="stat-zycia">❤️ Życia: 3</span>
+        <span id="stat-punkty">💀 Ujemne: 0</span>
+        <span id="stat-etap">🏆 Pytanie: 1</span>
+    </div>
 
-def losowanie_kart():
-    global miod, miod_za_odpowiedz
-    print("\n--- 🎴 ZDOBYWASZ KARTĘ! 🎴 ---")
-    typ_karty = random.randint(1, 4)
+    <div id="pets">🐾 Zwierzaki: Brak</div>
     
-    if typ_karty == 1:
-        ile = random.randint(10, 1000)
-        miod += ile
-        print(f"KARTA: Znalazłeś ukryty miód! +{ile}")
-    elif typ_karty == 2:
-        strata = random.choice([0.25, 0.50, 0.75])
-        utracony = math.floor(miod * strata)
-        miod -= utracony
-        print(f"KARTA: Dziura w ulu! Tracisz {int(strata*100)}% miodu (-{utracony}).")
-    elif typ_karty == 3:
-        print("KARTA: Pusta karta. Nic się nie dzieje.")
-    elif typ_karty == 4:
-        ile_wiecej = random.randint(5, 50)
-        miod_za_odpowiedz += ile_wiecej
-        print(f"KARTA: Uczysz się! Za dobrą odpowiedź dostajesz o +{ile_wiecej} miodu więcej!")
+    <div id="message-board">Wciśnij Start, aby rozpocząć grę!</div>
 
-# --- GŁÓWNA PĘTLA GRY ---
-print("WITAJ W EPICKIEJ GRZE ORTOGRAFICZNEJ!")
-print("Zasady zmieniają się co 10 pytań. Bądź czujny!")
+    <div id="action-buttons">
+        <button class="btn" onclick="rozpocznijGre()">▶️ START</button>
+    </div>
+</div>
 
-while zycia > 0:
-    zarobek_pszczolek()
+<script>
+    // Zmienne gracza
+    let miod = 0; let miodZaOdp = 10; let zycia = 3; let punktyUjemne = 0; let zadanePytania = 0;
+    let posiadaneZwierzaki = []; let iloscPszczolek = 0; let poprawneOdp = 0;
     
-    # --- ZMIANA KATEGORII CO 10 PYTAŃ ---
-    indeks_kategorii = (zadane_pytania // 10) % len(kategorie)
-    aktualna_kategoria = kategorie[indeks_kategorii]
-    
-    if aktualna_kategoria != poprzednia_kategoria:
-        print("\n" + "🌟"*20)
-        print(f"🏆 NOWY ETAP! Twoja główna zasada to teraz: {aktualna_kategoria.upper()}! 🏆")
-        print("🌟"*20)
-        poprzednia_kategoria = aktualna_kategoria
+    let aktualnePytanie = null;
+    let mnoznikMiodu = 1; let karaZaBlad = 1; let karyUjemne = 10; let zlotaSzansa = false;
 
-    print("\n" + "="*40)
-    print(f"🍯 Miód: {miod} | ❤️ Życia: {zycia} | 💀 Ujemne pkt: {punkty_ujemne} | ❓ Pytanie: {zadane_pytania + 1}")
-    if posiadane_zwierzaki:
-        print(f"🐾 Zwierzaki: {', '.join(posiadane_zwierzaki)}")
-    print("="*40)
+    // Baza Pytań
+    const bazaPytan = {
+        "Ó czy U": [
+            { pyt: "Jak napiszesz: 1. góra, czy 2. gura?", odp: 1 },
+            { pyt: "Jak napiszesz: 1. pszczułka, czy 2. pszczółka?", odp: 2 },
+            { pyt: "Jak napiszesz: 1. ulu, czy 2. óló?", odp: 1 },
+            { pyt: "Jak napiszesz: 1. głuwna, czy 2. główna?", odp: 2 }
+        ],
+        "RZ czy Ż": [
+            { pyt: "Jak napiszesz: 1. rzeka, czy 2. żeka?", odp: 1 },
+            { pyt: "Jak napiszesz: 1. rzaba, czy 2. żaba?", odp: 2 },
+            { pyt: "Jak napiszesz: 1. jeźeli, czy 2. jeżeli?", odp: 2 }
+        ],
+        "Miękkie: Ś, Ź, Ć, Ń": [
+            { pyt: "Jak napiszesz: 1. mroziny, czy 2. mroźny?", odp: 2 },
+            { pyt: "Jak napiszesz: 1. odpowiedź, czy 2. otpowiedź?", odp: 1 },
+            { pyt: "Jak napiszesz: 1. słońce, czy 2. słonice?", odp: 1 }
+        ]
+    };
+    const kategorie = Object.keys(bazaPytan);
 
-    # --- LOSOWANIE EVENTÓW ---
-    event = random.choice(["Brak", "Mroźny", "Wodny", "Mroczny", "Złowrogi"])
-    mnoznik_miodu = 1
-    kara_za_blad = 1
-    kary_ujemne = 10
-    
-    if event == "Mroźny":
-        print("❄️ EVENT MROŹNY! Mniej punktów ujemnych za błąd!")
-        kary_ujemne = 5
-    elif event == "Wodny":
-        print("🌊 EVENT WODNY! Poprawna odpowiedź daje x2 Miodu!")
-        mnoznik_miodu = 2
-    elif event == "Mroczny":
-        utracony = math.floor(miod * 0.25)
-        miod -= utracony
-        zycia += 1
-        print(f"🌑 EVENT MROCZNY! Tracisz 25% miodu, ale zyskujesz +1 Życie!")
-    elif event == "Złowrogi":
-        print("👿 EVENT ZŁOWROGI! Zła odpowiedź zabiera aż 2 ŻYCIA!")
-        kara_za_blad = 2
+    // Pszczółki zarabiają co sekundę
+    setInterval(() => {
+        if (iloscPszczolek > 0 && zycia > 0) {
+            miod += (20 * iloscPszczolek);
+            odswiezStatystyki();
+        }
+    }, 1000);
+
+    function pisz(tekst) {
+        document.getElementById("message-board").innerHTML = tekst;
+    }
+
+    function odswiezStatystyki() {
+        document.getElementById("stat-miod").innerText = `🍯 Miód: ${miod}`;
+        document.getElementById("stat-zycia").innerText = `❤️ Życia: ${zycia}`;
+        document.getElementById("stat-punkty").innerText = `💀 Ujemne: ${punktyUjemne}`;
+        document.getElementById("stat-etap").innerText = `🏆 Pytanie: ${zadanePytania + 1}`;
+        document.getElementById("pets").innerText = `🐾 Zwierzaki: ${posiadaneZwierzaki.length > 0 ? posiadaneZwierzaki.join(', ') : 'Brak'}`;
+    }
+
+    function rozpocznijGre() {
+        nastepnePytanie();
+    }
+
+    function nastepnePytanie() {
+        if (zycia <= 0) {
+            pisz(`💀 KONIEC GRY! 💀<br>Przetrwałeś ${zadanePytania} pytań.<br>Zdobyty miód: ${miod}<br>Punkty ujemne: ${punktyUjemne}`);
+            document.getElementById("action-buttons").innerHTML = "";
+            return;
+        }
+
+        // Reset modyfikatorów
+        mnoznikMiodu = 1; karaZaBlad = 1; karyUjemne = 10;
+        let wiadomoscEventu = "";
+
+        // Losowanie Eventu
+        let eventy = ["Brak", "Mroźny", "Wodny", "Mroczny", "Złowrogi"];
+        let wylosowanyEvent = eventy[Math.floor(Math.random() * eventy.length)];
         
-    zlota_szansa = random.random() <= 0.10
-    if zlota_szansa:
-        print("🌟 ZŁOTA ODPOWIEDŹ! Odpowiedz poprawnie, aby zdobyć zwierzaka!")
+        if (wylosowanyEvent === "Mroźny") {
+            wiadomoscEventu = "<br>❄️ EVENT MROŹNY! Mniej punktów ujemnych za błąd!";
+            karyUjemne = 5;
+        } else if (wylosowanyEvent === "Wodny") {
+            wiadomoscEventu = "<br>🌊 EVENT WODNY! Poprawna odpowiedź daje x2 Miodu!";
+            mnoznikMiodu = 2;
+        } else if (wylosowanyEvent === "Mroczny") {
+            let utracony = Math.floor(miod * 0.25);
+            miod -= utracony; zycia += 1;
+            wiadomoscEventu = `<br>🌑 EVENT MROCZNY! Tracisz 25% miodu, ale zyskujesz +1 Życie!`;
+        } else if (wylosowanyEvent === "Złowrogi") {
+            wiadomoscEventu = "<br>👿 EVENT ZŁOWROGI! Zła odpowiedź zabiera aż 2 ŻYCIA!";
+            karaZaBlad = 2;
+        }
 
-    # --- ZADAWANIE PYTANIA Z AKTUALNEJ KATEGORII ---
-    pytanie = random.choice(baza_pytan[aktualna_kategoria])
-    print("\n" + pytanie["pytanie"])
-    odp = input("Wybierz 1 lub 2: ")
-    
-    zadane_pytania += 1 # Dodajemy pytanie do licznika
-    
-    # --- SPRAWDZANIE ODPOWIEDZI ---
-    if odp == pytanie["odpowiedz"]:
-        zdobyty = miod_za_odpowiedz * mnoznik_miodu
-        miod += zdobyty
-        poprawne_odpowiedzi += 1
-        print(f"✅ Dobrze! Dostajesz +{zdobyty} miodu.")
+        zlotaSzansa = Math.random() <= 0.10;
+        if (zlotaSzansa) wiadomoscEventu += "<br>🌟 ZŁOTA ODPOWIEDŹ! Poprawna odp daje zwierzaka!";
+
+        // Kategoria i pytanie
+        let indeksKategorii = Math.floor(zadanePytania / 10) % kategorie.length;
+        let aktualnaKategoria = kategorie[indeksKategorii];
+        let pytaniaZKategorii = bazaPytan[aktualnaKategoria];
+        aktualnePytanie = pytaniaZKategorii[Math.floor(Math.random() * pytaniaZKategorii.length)];
+
+        let naglowek = `🏆 ZASADA: ${aktualnaKategoria.toUpperCase()} 🏆<br><br>`;
+        pisz(naglowek + aktualnePytanie.pyt + wiadomoscEventu);
+
+        document.getElementById("action-buttons").innerHTML = `
+            <button class="btn" onclick="sprawdzOdpowiedz(1)">Opcja 1</button>
+            <button class="btn" onclick="sprawdzOdpowiedz(2)">Opcja 2</button>
+        `;
+        odswiezStatystyki();
+    }
+
+    function sprawdzOdpowiedz(odp) {
+        zadanePytania++;
+        let wynik = "";
+
+        if (odp === aktualnePytanie.odp) {
+            let zdobyty = miodZaOdp * mnoznikMiodu;
+            miod += zdobyty;
+            poprawneOdp++;
+            wynik = `✅ DOBRZE! Dostajesz +${zdobyty} miodu.`;
+            
+            if (zlotaSzansa) {
+                let wylosowany = losujZwierzaka();
+                wynik += `<br>✨ Zdobywasz zwierzaka: ${wylosowany}!`;
+            }
+
+            if (poprawneOdp % 3 === 0) {
+                pisz(wynik + "<br><br>🎴 ZDOBYWASZ KARTĘ!");
+                document.getElementById("action-buttons").innerHTML = `
+                    <button class="btn card-btn" onclick="odkryjKarte()">Odkryj Kartę 1</button>
+                    <button class="btn card-btn" onclick="odkryjKarte()">Odkryj Kartę 2</button>
+                    <button class="btn card-btn" onclick="odkryjKarte()">Odkryj Kartę 3</button>
+                `;
+                odswiezStatystyki();
+                return; // Zatrzymuje tu, zeby gracz wybral karte
+            }
+        } else {
+            zycia -= karaZaBlad;
+            if (posiadaneZwierzaki.includes("Pancernik")) {
+                karyUjemne = Math.floor(karyUjemne / 2);
+                wynik += "🦔 Pancernik blokuje połowę kar!<br>";
+            }
+            punktyUjemne += karyUjemne;
+            wynik += `❌ ŹLE! Tracisz ${karaZaBlad} życie i +${karyUjemne} ujemnych pkt.`;
+        }
+
+        pisz(wynik);
+        odswiezStatystyki();
+        document.getElementById("action-buttons").innerHTML = `<button class="btn" onclick="nastepnePytanie()">Dalej ➡️</button>`;
+    }
+
+    function losujZwierzaka() {
+        let zwierzaki = ["Pies", "Kot", "Pancernik", "Pszczółka"];
+        let w = zwierzaki[Math.floor(Math.random() * zwierzaki.length)];
+        posiadaneZwierzaki.push(w);
         
-        if zlota_szansa:
-            losuj_zwierzatko()
-            
-        if poprawne_odpowiedzi % 3 == 0:
-            losowanie_kart()
-            
-    else:
-        zycia -= kara_za_blad
-        if "Pancernik" in posiadane_zwierzaki:
-            kary_ujemne = math.floor(kary_ujemne / 2)
-            print("🦔 Twój pancernik blokuje połowę punktów ujemnych!")
-            
-        punkty_ujemne += kary_ujemne
-        print(f"❌ Źle! Tracisz {kara_za_blad} życie i dostajesz +{kary_ujemne} punktów ujemnych.")
+        if (w === "Pies") zycia += 2;
+        else if (w === "Kot" && Math.random() <= 0.75) miod += 500;
+        else if (w === "Pszczółka") iloscPszczolek += 1;
+        
+        return w;
+    }
 
-    time.sleep(1)
+    function odkryjKarte() {
+        let typKarty = Math.floor(Math.random() * 4) + 1;
+        let efekt = "";
 
-print("\n" + "💀 "*10)
-print(f"KONIEC GRY! Przetrwałeś {zadane_pytania} pytań.")
-print(f"Twój wynik:")
-print(f"🍯 Zebrany miód: {miod}")
-print(f"💀 Punkty ujemne: {punkty_ujemne}")
-print(f"🐾 Zdobyte zwierzaki: {len(posiadane_zwierzaki)}")
+        if (typKarty === 1) {
+            let ile = Math.floor(Math.random() * 990) + 10;
+            miod += ile;
+            efekt = `Znalazłeś ukryty miód! +${ile} 🍯`;
+        } else if (typKarty === 2) {
+            let utracony = Math.floor(miod * 0.50);
+            miod -= utracony;
+            efekt = `Dziura w ulu! Tracisz połowę miodu (-${utracony}) 😱`;
+        } else if (typKarty === 3) {
+            efekt = `Pusta karta. Nic się nie dzieje. 🃏`;
+        } else if (typKarty === 4) {
+            miodZaOdp += 10;
+            efekt = `Uczysz się! +10 miodu na stałe za dobrą odpowiedź! 📚`;
+        }
+
+        pisz(`🎴 KARTA: ${efekt}`);
+        odswiezStatystyki();
+        document.getElementById("action-buttons").innerHTML = `<button class="btn" onclick="nastepnePytanie()">Dalej ➡️</button>`;
+    }
+</script>
+
+</body>
+</html>
