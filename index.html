@@ -1,1 +1,222 @@
 
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gra Ortograficzna</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #fce4ec; text-align: center; margin: 0; padding: 20px; }
+        #game-box { background: white; max-width: 600px; margin: 0 auto; padding: 20px; border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        h1 { color: #d81b60; }
+        .stats { display: flex; justify-content: space-around; background: #fff176; padding: 10px; border-radius: 10px; font-weight: bold; margin-bottom: 20px; }
+        .btn { background: #4CAF50; color: white; border: none; padding: 15px 20px; margin: 10px; font-size: 16px; border-radius: 10px; cursor: pointer; }
+        .btn:hover { background: #45a049; }
+        .card-btn { background: #9c27b0; }
+        .card-btn:hover { background: #7b1fa2; }
+        #message-board { font-size: 18px; min-height: 100px; margin-bottom: 20px; color: #333; font-weight: bold;}
+        #pets { font-size: 14px; color: #555; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div id="game-box">
+    <h1>🍯 Gra Ortograficzna! 🐻</h1>
+    
+    <div class="stats">
+        <span id="stat-miod">🍯 Miód: 0</span>
+        <span id="stat-zycia">❤️ Życia: 3</span>
+        <span id="stat-punkty">💀 Ujemne: 0</span>
+        <span id="stat-etap">🏆 Pytanie: 1</span>
+    </div>
+
+    <div id="pets">🐾 Zwierzaki: Brak</div>
+    
+    <div id="message-board">Wciśnij Start, aby rozpocząć grę!</div>
+
+    <div id="action-buttons">
+        <button class="btn" onclick="rozpocznijGre()">▶️ START</button>
+    </div>
+</div>
+
+<script>
+    // Zmienne gracza
+    let miod = 0; let miodZaOdp = 10; let zycia = 3; let punktyUjemne = 0; let zadanePytania = 0;
+    let posiadaneZwierzaki = []; let iloscPszczolek = 0; let poprawneOdp = 0;
+    
+    let aktualnePytanie = null;
+    let mnoznikMiodu = 1; let karaZaBlad = 1; let karyUjemne = 10; let zlotaSzansa = false;
+
+    // Baza Pytań
+    const bazaPytan = {
+        "Ó czy U": [
+            { pyt: "Jak napiszesz: 1. góra, czy 2. gura?", odp: 1 },
+            { pyt: "Jak napiszesz: 1. pszczułka, czy 2. pszczółka?", odp: 2 },
+            { pyt: "Jak napiszesz: 1. ulu, czy 2. óló?", odp: 1 },
+            { pyt: "Jak napiszesz: 1. głuwna, czy 2. główna?", odp: 2 }
+        ],
+        "RZ czy Ż": [
+            { pyt: "Jak napiszesz: 1. rzeka, czy 2. żeka?", odp: 1 },
+            { pyt: "Jak napiszesz: 1. rzaba, czy 2. żaba?", odp: 2 },
+            { pyt: "Jak napiszesz: 1. jeźeli, czy 2. jeżeli?", odp: 2 }
+        ],
+        "Miękkie: Ś, Ź, Ć, Ń": [
+            { pyt: "Jak napiszesz: 1. mroziny, czy 2. mroźny?", odp: 2 },
+            { pyt: "Jak napiszesz: 1. odpowiedź, czy 2. otpowiedź?", odp: 1 },
+            { pyt: "Jak napiszesz: 1. słońce, czy 2. słonice?", odp: 1 }
+        ]
+    };
+    const kategorie = Object.keys(bazaPytan);
+
+    // Pszczółki zarabiają co sekundę
+    setInterval(() => {
+        if (iloscPszczolek > 0 && zycia > 0) {
+            miod += (20 * iloscPszczolek);
+            odswiezStatystyki();
+        }
+    }, 1000);
+
+    function pisz(tekst) {
+        document.getElementById("message-board").innerHTML = tekst;
+    }
+
+    function odswiezStatystyki() {
+        document.getElementById("stat-miod").innerText = `🍯 Miód: ${miod}`;
+        document.getElementById("stat-zycia").innerText = `❤️ Życia: ${zycia}`;
+        document.getElementById("stat-punkty").innerText = `💀 Ujemne: ${punktyUjemne}`;
+        document.getElementById("stat-etap").innerText = `🏆 Pytanie: ${zadanePytania + 1}`;
+        document.getElementById("pets").innerText = `🐾 Zwierzaki: ${posiadaneZwierzaki.length > 0 ? posiadaneZwierzaki.join(', ') : 'Brak'}`;
+    }
+
+    function rozpocznijGre() {
+        nastepnePytanie();
+    }
+
+    function nastepnePytanie() {
+        if (zycia <= 0) {
+            pisz(`💀 KONIEC GRY! 💀<br>Przetrwałeś ${zadanePytania} pytań.<br>Zdobyty miód: ${miod}<br>Punkty ujemne: ${punktyUjemne}`);
+            document.getElementById("action-buttons").innerHTML = "";
+            return;
+        }
+
+        // Reset modyfikatorów
+        mnoznikMiodu = 1; karaZaBlad = 1; karyUjemne = 10;
+        let wiadomoscEventu = "";
+
+        // Losowanie Eventu
+        let eventy = ["Brak", "Mroźny", "Wodny", "Mroczny", "Złowrogi"];
+        let wylosowanyEvent = eventy[Math.floor(Math.random() * eventy.length)];
+        
+        if (wylosowanyEvent === "Mroźny") {
+            wiadomoscEventu = "<br>❄️ EVENT MROŹNY! Mniej punktów ujemnych za błąd!";
+            karyUjemne = 5;
+        } else if (wylosowanyEvent === "Wodny") {
+            wiadomoscEventu = "<br>🌊 EVENT WODNY! Poprawna odpowiedź daje x2 Miodu!";
+            mnoznikMiodu = 2;
+        } else if (wylosowanyEvent === "Mroczny") {
+            let utracony = Math.floor(miod * 0.25);
+            miod -= utracony; zycia += 1;
+            wiadomoscEventu = `<br>🌑 EVENT MROCZNY! Tracisz 25% miodu, ale zyskujesz +1 Życie!`;
+        } else if (wylosowanyEvent === "Złowrogi") {
+            wiadomoscEventu = "<br>👿 EVENT ZŁOWROGI! Zła odpowiedź zabiera aż 2 ŻYCIA!";
+            karaZaBlad = 2;
+        }
+
+        zlotaSzansa = Math.random() <= 0.10;
+        if (zlotaSzansa) wiadomoscEventu += "<br>🌟 ZŁOTA ODPOWIEDŹ! Poprawna odp daje zwierzaka!";
+
+        // Kategoria i pytanie
+        let indeksKategorii = Math.floor(zadanePytania / 10) % kategorie.length;
+        let aktualnaKategoria = kategorie[indeksKategorii];
+        let pytaniaZKategorii = bazaPytan[aktualnaKategoria];
+        aktualnePytanie = pytaniaZKategorii[Math.floor(Math.random() * pytaniaZKategorii.length)];
+
+        let naglowek = `🏆 ZASADA: ${aktualnaKategoria.toUpperCase()} 🏆<br><br>`;
+        pisz(naglowek + aktualnePytanie.pyt + wiadomoscEventu);
+
+        document.getElementById("action-buttons").innerHTML = `
+            <button class="btn" onclick="sprawdzOdpowiedz(1)">Opcja 1</button>
+            <button class="btn" onclick="sprawdzOdpowiedz(2)">Opcja 2</button>
+        `;
+        odswiezStatystyki();
+    }
+
+    function sprawdzOdpowiedz(odp) {
+        zadanePytania++;
+        let wynik = "";
+
+        if (odp === aktualnePytanie.odp) {
+            let zdobyty = miodZaOdp * mnoznikMiodu;
+            miod += zdobyty;
+            poprawneOdp++;
+            wynik = `✅ DOBRZE! Dostajesz +${zdobyty} miodu.`;
+            
+            if (zlotaSzansa) {
+                let wylosowany = losujZwierzaka();
+                wynik += `<br>✨ Zdobywasz zwierzaka: ${wylosowany}!`;
+            }
+
+            if (poprawneOdp % 3 === 0) {
+                pisz(wynik + "<br><br>🎴 ZDOBYWASZ KARTĘ!");
+                document.getElementById("action-buttons").innerHTML = `
+                    <button class="btn card-btn" onclick="odkryjKarte()">Odkryj Kartę 1</button>
+                    <button class="btn card-btn" onclick="odkryjKarte()">Odkryj Kartę 2</button>
+                    <button class="btn card-btn" onclick="odkryjKarte()">Odkryj Kartę 3</button>
+                `;
+                odswiezStatystyki();
+                return; // Zatrzymuje tu, zeby gracz wybral karte
+            }
+        } else {
+            zycia -= karaZaBlad;
+            if (posiadaneZwierzaki.includes("Pancernik")) {
+                karyUjemne = Math.floor(karyUjemne / 2);
+                wynik += "🦔 Pancernik blokuje połowę kar!<br>";
+            }
+            punktyUjemne += karyUjemne;
+            wynik += `❌ ŹLE! Tracisz ${karaZaBlad} życie i +${karyUjemne} ujemnych pkt.`;
+        }
+
+        pisz(wynik);
+        odswiezStatystyki();
+        document.getElementById("action-buttons").innerHTML = `<button class="btn" onclick="nastepnePytanie()">Dalej ➡️</button>`;
+    }
+
+    function losujZwierzaka() {
+        let zwierzaki = ["Pies", "Kot", "Pancernik", "Pszczółka"];
+        let w = zwierzaki[Math.floor(Math.random() * zwierzaki.length)];
+        posiadaneZwierzaki.push(w);
+        
+        if (w === "Pies") zycia += 2;
+        else if (w === "Kot" && Math.random() <= 0.75) miod += 500;
+        else if (w === "Pszczółka") iloscPszczolek += 1;
+        
+        return w;
+    }
+
+    function odkryjKarte() {
+        let typKarty = Math.floor(Math.random() * 4) + 1;
+        let efekt = "";
+
+        if (typKarty === 1) {
+            let ile = Math.floor(Math.random() * 990) + 10;
+            miod += ile;
+            efekt = `Znalazłeś ukryty miód! +${ile} 🍯`;
+        } else if (typKarty === 2) {
+            let utracony = Math.floor(miod * 0.50);
+            miod -= utracony;
+            efekt = `Dziura w ulu! Tracisz połowę miodu (-${utracony}) 😱`;
+        } else if (typKarty === 3) {
+            efekt = `Pusta karta. Nic się nie dzieje. 🃏`;
+        } else if (typKarty === 4) {
+            miodZaOdp += 10;
+            efekt = `Uczysz się! +10 miodu na stałe za dobrą odpowiedź! 📚`;
+        }
+
+        pisz(`🎴 KARTA: ${efekt}`);
+        odswiezStatystyki();
+        document.getElementById("action-buttons").innerHTML = `<button class="btn" onclick="nastepnePytanie()">Dalej ➡️</button>`;
+    }
+</script>
+
+</body>
+</html>
