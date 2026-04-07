@@ -7,42 +7,93 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="game">
-    <h1>🍯 Miodowa Ortografia</h1>
+  <div class="container">
 
-    <div class="stats">
-      <div>🍯 Miód: <span id="honey">0</span></div>
-      <div>❤️ Życia: <span id="lives">3</span></div>
-      <div>❓ Pytanie: <span id="questionNumber">1</span></div>
-      <div>📚 Etap: <span id="stageName">Ó / U</span></div>
-    </div>
+    <!-- EKRAN STARTOWY -->
+    <section id="startScreen" class="screen active">
+      <h1>🍯 Miodowa Ortografia</h1>
+      <p class="subtitle">Odpowiadaj dobrze, zdobywaj miód, losuj karty i zbieraj zwierzątka!</p>
 
-    <div class="event-bar">
-      <strong>Aktywny event:</strong> <span id="activeEvent">Brak</span>
-    </div>
+      <div class="menu-buttons">
+        <button id="startGameBtn">▶ Start gry</button>
+        <button id="showLobbyBtn">🏠 Lobby / Top 10</button>
+      </div>
+    </section>
 
-    <div class="pet-bar">
-      <strong>Zwierzątko:</strong> <span id="pet">Brak</span>
-    </div>
+    <!-- LOBBY -->
+    <section id="lobbyScreen" class="screen">
+      <h1>🏠 Lobby</h1>
 
-    <div class="question-box">
-      <h2 id="questionText">Ładowanie pytania...</h2>
-      <div class="answers" id="answers"></div>
-    </div>
+      <div class="panel">
+        <h2>Najlepsze wyniki - Top 10</h2>
+        <ol id="top10List" class="ranking-list"></ol>
+      </div>
 
-    <div class="gold-box" id="goldBox" style="display:none;">
-      ✨ Złota odpowiedź! Jeśli odpowiesz dobrze, dostaniesz zwierzątko!
-    </div>
+      <div class="menu-buttons">
+        <button id="backToStartBtn">⬅ Wróć</button>
+        <button id="startFromLobbyBtn">▶ Start gry</button>
+      </div>
+    </section>
 
-    <div class="cards-section" id="cardsSection" style="display:none;">
-      <h3>Wybierz 1 z 3 kart</h3>
-      <div class="cards" id="cards"></div>
-    </div>
+    <!-- GRA -->
+    <section id="gameScreen" class="screen">
+      <h1>🍯 Miodowa Ortografia</h1>
 
-    <div class="message" id="message"></div>
+      <div class="stats">
+        <div>🍯 Miód: <span id="honey">0</span></div>
+        <div>❤️ Życia: <span id="lives">3</span></div>
+        <div>❓ Pytanie: <span id="questionNumber">1</span></div>
+        <div>📚 Etap: <span id="stageName">Ó / U</span></div>
+      </div>
 
-    <button id="nextBtn" style="display:none;">Następne pytanie</button>
-    <button id="restartBtn" style="display:none;">Zagraj od nowa</button>
+      <div class="event-bar">
+        <strong>Aktywny event:</strong> <span id="activeEvent">Brak</span>
+      </div>
+
+      <div class="pet-bar">
+        <strong>Zwierzątko:</strong> <span id="pet">Brak</span>
+      </div>
+
+      <div class="gold-box" id="goldBox" style="display:none;">
+        ✨ Złota odpowiedź! Jeśli odpowiesz dobrze, dostaniesz zwierzątko!
+      </div>
+
+      <div class="question-box">
+        <h2 id="questionText">Ładowanie pytania...</h2>
+        <div class="answers" id="answers"></div>
+      </div>
+
+      <div class="cards-section" id="cardsSection" style="display:none;">
+        <h3>Wybierz 1 z 3 kart</h3>
+        <div class="cards" id="cards"></div>
+      </div>
+
+      <div class="message" id="message"></div>
+
+      <div class="menu-buttons">
+        <button id="nextBtn" style="display:none;">Następne pytanie</button>
+        <button id="goLobbyBtn">🏠 Lobby</button>
+      </div>
+    </section>
+
+    <!-- KONIEC GRY -->
+    <section id="gameOverScreen" class="screen">
+      <h1>💀 Koniec gry</h1>
+
+      <div class="panel">
+        <p>Twój wynik: <strong><span id="finalScore">0</span></strong> miodu</p>
+
+        <label for="playerName">Wpisz nazwę gracza:</label>
+        <input type="text" id="playerName" maxlength="20" placeholder="Np. Pszczółka123" />
+
+        <div class="menu-buttons">
+          <button id="saveScoreBtn">💾 Zapisz wynik</button>
+          <button id="restartBtn">🔁 Zagraj ponownie</button>
+          <button id="gameOverLobbyBtn">🏠 Lobby</button>
+        </div>
+      </div>
+    </section>
+
   </div>
 
   <script src="script.js"></script>
