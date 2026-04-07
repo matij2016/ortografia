@@ -9,29 +9,75 @@
 <body>
   <div class="container">
 
-    <!-- EKRAN STARTOWY -->
+    <!-- START -->
     <section id="startScreen" class="screen active">
       <h1>🍯 Miodowa Ortografia</h1>
-      <p class="subtitle">Odpowiadaj dobrze, zdobywaj miód, losuj karty i zbieraj zwierzątka!</p>
+      <p class="subtitle">Ucz się ortografii, zbieraj miód, odblokowuj eventy i zwierzątka!</p>
 
-      <div class="menu-buttons">
-        <button id="startGameBtn">▶ Start gry</button>
-        <button id="showLobbyBtn">🏠 Lobby / Top 10</button>
+      <div class="panel start-panel">
+        <label for="startName">Wpisz nick:</label>
+        <input type="text" id="startName" maxlength="20" placeholder="Np. Miodzio123" />
+
+        <div class="menu-buttons">
+          <button id="startGameBtn">▶ Start gry</button>
+          <button id="showLobbyBtn">🏆 Top 10</button>
+          <button id="showShopBtn">🛒 Sklep</button>
+        </div>
       </div>
     </section>
 
     <!-- LOBBY -->
     <section id="lobbyScreen" class="screen">
-      <h1>🏠 Lobby</h1>
-
+      <h1>🏆 Top 10</h1>
       <div class="panel">
-        <h2>Najlepsze wyniki - Top 10</h2>
         <ol id="top10List" class="ranking-list"></ol>
       </div>
+      <div class="menu-buttons">
+        <button id="clearRankingBtn">🗑 Wyczyść ranking</button>
+        <button id="backToStartBtn">⬅ Wróć</button>
+      </div>
+    </section>
+
+    <!-- SKLEP -->
+    <section id="shopScreen" class="screen">
+      <h1>🛒 Sklep</h1>
+      <div class="panel">
+        <p>Nick: <strong id="shopPlayerName">Brak</strong></p>
+        <p>Stan miodu: <strong><span id="shopHoney">0</span></strong></p>
+      </div>
+
+      <div class="shop-grid">
+        <div class="shop-item">
+          <h3>❤️ +1 życie</h3>
+          <p>Cena: 100 miodu</p>
+          <button onclick="buyItem('life')">Kup</button>
+        </div>
+
+        <div class="shop-item">
+          <h3>🍯 x2 startowego miodu</h3>
+          <p>Cena: 150 miodu</p>
+          <button onclick="buyItem('doubleStart')">Kup</button>
+        </div>
+
+        <div class="shop-item">
+          <h3>🛡 Tarcza</h3>
+          <p>Cena: 200 miodu</p>
+          <p>Blokuje 1 złą odpowiedź</p>
+          <button onclick="buyItem('shield')">Kup</button>
+        </div>
+
+        <div class="shop-item">
+          <h3>✨ Większa szansa na złotą odpowiedź</h3>
+          <p>Cena: 250 miodu</p>
+          <p>+10% szansy</p>
+          <button onclick="buyItem('goldChance')">Kup</button>
+        </div>
+      </div>
+
+      <div class="panel" id="shopMessage">Kupuj ulepszenia za miód zdobyty w poprzednich grach.</div>
 
       <div class="menu-buttons">
-        <button id="backToStartBtn">⬅ Wróć</button>
-        <button id="startFromLobbyBtn">▶ Start gry</button>
+        <button id="backFromShopBtn">⬅ Wróć</button>
       </div>
     </section>
 
@@ -39,57 +85,78 @@
     <section id="gameScreen" class="screen">
       <h1>🍯 Miodowa Ortografia</h1>
 
-      <div class="stats">
+      <div class="panel topbar">
+        <div>👤 Nick: <span id="playerDisplay">Brak</span></div>
         <div>🍯 Miód: <span id="honey">0</span></div>
         <div>❤️ Życia: <span id="lives">3</span></div>
-        <div>❓ Pytanie: <span id="questionNumber">1</span></div>
+        <div>❓ Pytanie: <span id="questionNumber">1</span>/<span id="maxQuestions">50</span></div>
         <div>📚 Etap: <span id="stageName">Ó / U</span></div>
+        <div>🛡 Tarcze: <span id="shields">0</span></div>
       </div>
 
-      <div class="event-bar">
+      <div class="panel">
+        <div class="progress-label">Postęp do kolejnego etapu</div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+
+      <div class="event-bar panel">
         <strong>Aktywny event:</strong> <span id="activeEvent">Brak</span>
       </div>
 
-      <div class="pet-bar">
+      <div class="pet-bar panel">
         <strong>Zwierzątko:</strong> <span id="pet">Brak</span>
       </div>
 
-      <div class="gold-box" id="goldBox" style="display:none;">
-        ✨ Złota odpowiedź! Jeśli odpowiesz dobrze, dostaniesz zwierzątko!
+      <div class="gold-box panel" id="goldBox" style="display:none;">
+        <div class="gold-animate">✨ ZŁOTA ODPOWIEDŹ ✨</div>
+        <div>Jeśli odpowiesz dobrze, dostaniesz zwierzątko!</div>
       </div>
 
-      <div class="question-box">
+      <div class="question-box panel">
         <h2 id="questionText">Ładowanie pytania...</h2>
         <div class="answers" id="answers"></div>
       </div>
 
-      <div class="cards-section" id="cardsSection" style="display:none;">
+      <div class="cards-section panel" id="cardsSection" style="display:none;">
         <h3>Wybierz 1 z 3 kart</h3>
         <div class="cards" id="cards"></div>
       </div>
 
-      <div class="message" id="message"></div>
+      <div class="message panel" id="message"></div>
 
       <div class="menu-buttons">
         <button id="nextBtn" style="display:none;">Następne pytanie</button>
-        <button id="goLobbyBtn">🏠 Lobby</button>
+        <button id="goLobbyBtn">🏆 Top 10</button>
       </div>
     </section>
 
-    <!-- KONIEC GRY -->
+    <!-- KONIEC -->
     <section id="gameOverScreen" class="screen">
       <h1>💀 Koniec gry</h1>
-
       <div class="panel">
-        <p>Twój wynik: <strong><span id="finalScore">0</span></strong> miodu</p>
-
-        <label for="playerName">Wpisz nazwę gracza:</label>
-        <input type="text" id="playerName" maxlength="20" placeholder="Np. Pszczółka123" />
-
+        <p>Gracz: <strong id="gameOverName">Brak</strong></p>
+        <p>Wynik: <strong><span id="finalScore">0</span></strong> miodu</p>
         <div class="menu-buttons">
           <button id="saveScoreBtn">💾 Zapisz wynik</button>
           <button id="restartBtn">🔁 Zagraj ponownie</button>
-          <button id="gameOverLobbyBtn">🏠 Lobby</button>
+          <button id="gameOverToStartBtn">🏠 Start</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ZWYCIĘSTWO -->
+    <section id="winScreen" class="screen">
+      <h1>👑 Zwycięstwo!</h1>
+      <div class="panel">
+        <p>Gracz: <strong id="winName">Brak</strong></p>
+        <p>Ukończyłeś wszystkie pytania!</p>
+        <p>Końcowy wynik: <strong><span id="winScore">0</span></strong> miodu</p>
+        <div class="menu-buttons">
+          <button id="saveWinScoreBtn">💾 Zapisz wynik</button>
+          <button id="playAgainFromWinBtn">🔁 Zagraj ponownie</button>
+          <button id="winToStartBtn">🏠 Start</button>
         </div>
       </div>
     </section>
