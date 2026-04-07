@@ -1,176 +1,135 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Miodowa Ortografia</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div class="bee bee1">🐝</div>
-  <div class="bee bee2">🐝</div>
-  <div class="bee bee3">🐝</div>
+function renderShop() {
+  const shopGrid = document.getElementById("shopGrid");
+  shopGrid.innerHTML = "";
 
-  <div class="container">
+  Object.keys(upgradeConfig).forEach(type => {
+    const config = upgradeConfig[type];
+    const level = profile.permanentUpgrades[type];
+    const price = getUpgradePrice(type);
+    const isMax = level >= config.maxLevel;
 
-    <section id="startScreen" class="screen active">
-      <h1>🍯 Miodowa Ortografia</h1>
-      <p class="subtitle">Ucz się ortografii i buduj najlepszy ul!</p>
+    const item = document.createElement("div");
+    item.className = "shop-item";
 
-      <div class="panel start-panel">
-        <label for="startName">Wpisz nick:</label>
-        <input type="text" id="startName" maxlength="20" placeholder="Np. Miodzio123" />
+    item.innerHTML = `
+      <h3>${config.name}</h3>
+      <p><strong>Poziom:</strong> ${level}/${config.maxLevel}</p>
+      <p>${config.description(level)}</p>
+      <p><strong>Cena:</strong> ${isMax ? "MAX" : price + " miodu"}</p>
+      <button ${isMax ? "disabled" : ""} onclick="buyPermanentUpgrade('${type}')">
+        ${isMax ? "Maksymalny poziom" : "Kup ulepszenie"}
+      </button>
+    `;
 
-        <div class="menu-buttons">
-          <button id="startGameBtn">▶ Start gry</button>
-          <button id="showLobbyBtn">🏆 Top 10</button>
-          <button id="showShopBtn">🛒 Sklep</button>
-          <button id="muteBtn">🔊 Dźwięk: ON</button>
-        </div>
-      </div>
-    </section>
+    shopGrid.appendChild(item);
+  });
+}
+const upgradeConfig = {
+  extraLife: {
+    name: "❤️ Stałe +1 życie",
+    basePrice: 300,
+    maxLevel: 5,
+    description: level => `Startowe życia: +${level}`
+  },
+  startHoney: {
+    name: "🍯 Stałe +5 startowego miodu",
+    basePrice: 250,
+    maxLevel: 10,
+    description: level => `Startowy miód: +${level * 5}`
+  },
+  goldChance: {
+    name: "✨ +5% szansy na złotą odpowiedź",
+    basePrice: 350,
+    maxLevel: 10,
+    description: level => `Dodatkowa szansa: +${level * 5}%`
+  },
+  startShield: {
+    name: "🛡 +1 tarcza na start",
+    basePrice: 400,
+    maxLevel: 5,
+    description: level => `Startowe tarcze: +${level}`
+  },
+  answerBonus: {
+    name: "💰 +1 miodu za dobrą odpowiedź",
+    basePrice: 500,
+    maxLevel: 10,
+    description: level => `Bonus za poprawną odpowiedź: +${level}`
+  },
+  damageReduce: {
+    name: "🧱 -5% kar z kart",
+    basePrice: 450,
+    maxLevel: 10,
+    description: level => `Zmniejszenie kar: -${level * 5}%`
+  }
+};
+function getUpgradePrice(type) {
+  const level = profile.permanentUpgrades[type];
+  const config = upgradeConfig[type];
+  return config.basePrice + level * Math.floor(config.basePrice * 0.4);
+}
+function renderShop() {
+  const shopGrid = document.getElementById("shopGrid");
+  shopGrid.innerHTML = "";
 
-    <section id="lobbyScreen" class="screen">
-      <h1>🏆 Top 10</h1>
-      <div class="panel">
-        <ol id="top10List" class="ranking-list"></ol>
-      </div>
-      <div class="menu-buttons">
-        <button id="clearRankingBtn">🗑 Wyczyść ranking</button>
-        <button id="backToStartBtn">⬅ Wróć</button>
-      </div>
-    </section>
+  Object.keys(upgradeConfig).forEach(type => {
+    const config = upgradeConfig[type];
+    const level = profile.permanentUpgrades[type];
+    const price = getUpgradePrice(type);
+    const isMax = level >= config.maxLevel;
 
-    <section id="shopScreen" class="screen">
-      <h1>🛒 Sklep Ulepszeń</h1>
+    const item = document.createElement("div");
+    item.className = "shop-item";
 
-      <div class="panel">
-        <p>Gracz: <strong id="shopPlayerName">Brak</strong></p>
-        <p>Meta miód: <strong><span id="shopHoney">0</span></strong></p>
-      </div>
+    item.innerHTML = `
+      <h3>${config.name}</h3>
+      <p><strong>Poziom:</strong> ${level}/${config.maxLevel}</p>
+      <p>${config.description(level)}</p>
+      <p><strong>Cena:</strong> ${isMax ? "MAX" : price + " miodu"}</p>
+      <button ${isMax ? "disabled" : ""} onclick="buyPermanentUpgrade('${type}')">
+        ${isMax ? "Maksymalny poziom" : "Kup ulepszenie"}
+      </button>
+    `;
 
-      <div class="shop-grid">
-        <div class="shop-item">
-          <h3>❤️ Stałe +1 życie</h3>
-          <p>Cena: 300 miodu</p>
-          <button onclick="buyPermanentUpgrade('extraLife')">Kup</button>
-        </div>
+    shopGrid.appendChild(item);
+  });
+}
+function updateShopUI() {
+  document.getElementById("shopPlayerName").textContent = profile.name || "Brak";
+  document.getElementById("shopHoney").textContent = profile.metaHoney;
+  renderShop();
+}
+function buyPermanentUpgrade(type) {
+  const config = upgradeConfig[type];
+  const currentLevel = profile.permanentUpgrades[type];
 
-        <div class="shop-item">
-          <h3>🍯 Stałe +5 startowego miodu</h3>
-          <p>Cena: 250 miodu</p>
-          <button onclick="buyPermanentUpgrade('startHoney')">Kup</button>
-        </div>
+  if (currentLevel >= config.maxLevel) {
+    document.getElementById("shopMessage").textContent = "To ulepszenie ma już maksymalny poziom.";
+    return;
+  }
 
-        <div class="shop-item">
-          <h3>✨ +5% szansy na złotą odpowiedź</h3>
-          <p>Cena: 350 miodu</p>
-          <button onclick="buyPermanentUpgrade('goldChance')">Kup</button>
-        </div>
+  const price = getUpgradePrice(type);
 
-        <div class="shop-item">
-          <h3>🛡 +1 tarcza na start</h3>
-          <p>Cena: 400 miodu</p>
-          <button onclick="buyPermanentUpgrade('startShield')">Kup</button>
-        </div>
+  if (profile.metaHoney < price) {
+    document.getElementById("shopMessage").textContent = "Za mało meta miodu.";
+    return;
+  }
 
-        <div class="shop-item">
-          <h3>💰 +1 miodu za dobrą odpowiedź</h3>
-          <p>Cena: 500 miodu</p>
-          <button onclick="buyPermanentUpgrade('answerBonus')">Kup</button>
-        </div>
+  profile.metaHoney -= price;
+  profile.permanentUpgrades[type] += 1;
 
-        <div class="shop-item">
-          <h3>🧱 -5% kar z kart</h3>
-          <p>Cena: 450 miodu</p>
-          <button onclick="buyPermanentUpgrade('damageReduce')">Kup</button>
-        </div>
-      </div>
+  saveProfile();
+  updateShopUI();
+  playSound("buy");
 
-      <div class="panel" id="shopMessage">Kupuj stałe ulepszenia i rozwijaj swój profil.</div>
+  const newLevel = profile.permanentUpgrades[type];
 
-      <div class="menu-buttons">
-        <button id="backFromShopBtn">⬅ Wróć</button>
-      </div>
-    </section>
-
-    <section id="gameScreen" class="screen">
-      <h1>🍯 Miodowa Ortografia</h1>
-
-      <div class="panel topbar">
-        <div>👤 <span id="playerDisplay">Brak</span></div>
-        <div>🍯 <span id="honey">0</span></div>
-        <div>❤️ <span id="lives">3</span></div>
-        <div>🛡 <span id="shields">0</span></div>
-        <div>❓ <span id="questionNumber">1</span>/<span id="maxQuestions">50</span></div>
-        <div>📚 <span id="stageName">Ó / U</span></div>
-      </div>
-
-      <div class="panel">
-        <div class="progress-label">Postęp etapu</div>
-        <div class="progress-bar">
-          <div class="progress-fill" id="progressFill"></div>
-        </div>
-      </div>
-
-      <div class="panel fancy-panel">
-        <div><strong>Event:</strong> <span id="activeEvent">Brak</span></div>
-        <div><strong>Zwierzątko:</strong> <span id="pet">Brak</span></div>
-      </div>
-
-      <div class="gold-box panel" id="goldBox" style="display:none;">
-        <div class="gold-animate">✨ ZŁOTA ODPOWIEDŹ ✨</div>
-        <div>Odpowiedz dobrze, aby zdobyć specjalne zwierzątko!</div>
-      </div>
-
-      <div class="question-box panel">
-        <h2 id="questionText">Ładowanie pytania...</h2>
-        <div class="answers" id="answers"></div>
-      </div>
-
-      <div class="cards-section panel" id="cardsSection" style="display:none;">
-        <h3>Wybierz 1 z 3 kart</h3>
-        <div class="cards" id="cards"></div>
-      </div>
-
-      <div class="message panel" id="message"></div>
-
-      <div class="menu-buttons">
-        <button id="nextBtn" style="display:none;">Następne pytanie</button>
-        <button id="goLobbyBtn">🏆 Top 10</button>
-        <button id="muteBtnGame">🔊 Dźwięk: ON</button>
-      </div>
-    </section>
-
-    <section id="gameOverScreen" class="screen">
-      <h1>💀 Koniec gry</h1>
-      <div class="panel">
-        <p>Gracz: <strong id="gameOverName">Brak</strong></p>
-        <p>Wynik: <strong><span id="finalScore">0</span></strong> miodu</p>
-        <div class="menu-buttons">
-          <button id="saveScoreBtn">💾 Zapisz wynik</button>
-          <button id="restartBtn">🔁 Zagraj ponownie</button>
-          <button id="gameOverToStartBtn">🏠 Start</button>
-        </div>
-      </div>
-    </section>
-
-    <section id="winScreen" class="screen">
-      <h1>👑 Zwycięstwo!</h1>
-      <div class="panel">
-        <p>Gracz: <strong id="winName">Brak</strong></p>
-        <p>Ukończyłeś wszystkie pytania!</p>
-        <p>Końcowy wynik: <strong><span id="winScore">0</span></strong> miodu</p>
-        <div class="menu-buttons">
-          <button id="saveWinScoreBtn">💾 Zapisz wynik</button>
-          <button id="playAgainFromWinBtn">🔁 Zagraj ponownie</button>
-          <button id="winToStartBtn">🏠 Start</button>
-        </div>
-      </div>
-    </section>
-
-  </div>
-
-  <script src="script.js"></script>
-</body>
-</html>
+  document.getElementById("shopMessage").textContent =
+    `Kupiono ulepszenie: ${config.name}. Nowy poziom: ${newLevel}/${config.maxLevel}`;
+}
+    button:disabled {
+  background: #c9c9c9;
+  color: #666;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
