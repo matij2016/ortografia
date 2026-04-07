@@ -7,12 +7,15 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div class="bee bee1">🐝</div>
+  <div class="bee bee2">🐝</div>
+  <div class="bee bee3">🐝</div>
+
   <div class="container">
 
-    <!-- START -->
     <section id="startScreen" class="screen active">
       <h1>🍯 Miodowa Ortografia</h1>
-      <p class="subtitle">Ucz się ortografii, zbieraj miód, odblokowuj eventy i zwierzątka!</p>
+      <p class="subtitle">Ucz się ortografii i buduj najlepszy ul!</p>
 
       <div class="panel start-panel">
         <label for="startName">Wpisz nick:</label>
@@ -22,11 +25,11 @@
           <button id="startGameBtn">▶ Start gry</button>
           <button id="showLobbyBtn">🏆 Top 10</button>
           <button id="showShopBtn">🛒 Sklep</button>
+          <button id="muteBtn">🔊 Dźwięk: ON</button>
         </div>
       </div>
     </section>
 
-    <!-- LOBBY -->
     <section id="lobbyScreen" class="screen">
       <h1>🏆 Top 10</h1>
       <div class="panel">
@@ -38,80 +41,86 @@
       </div>
     </section>
 
-    <!-- SKLEP -->
     <section id="shopScreen" class="screen">
-      <h1>🛒 Sklep</h1>
+      <h1>🛒 Sklep Ulepszeń</h1>
+
       <div class="panel">
-        <p>Nick: <strong id="shopPlayerName">Brak</strong></p>
-        <p>Stan miodu: <strong><span id="shopHoney">0</span></strong></p>
+        <p>Gracz: <strong id="shopPlayerName">Brak</strong></p>
+        <p>Meta miód: <strong><span id="shopHoney">0</span></strong></p>
       </div>
 
       <div class="shop-grid">
         <div class="shop-item">
-          <h3>❤️ +1 życie</h3>
-          <p>Cena: 100 miodu</p>
-          <button onclick="buyItem('life')">Kup</button>
+          <h3>❤️ Stałe +1 życie</h3>
+          <p>Cena: 300 miodu</p>
+          <button onclick="buyPermanentUpgrade('extraLife')">Kup</button>
         </div>
 
         <div class="shop-item">
-          <h3>🍯 x2 startowego miodu</h3>
-          <p>Cena: 150 miodu</p>
-          <button onclick="buyItem('doubleStart')">Kup</button>
-        </div>
-
-        <div class="shop-item">
-          <h3>🛡 Tarcza</h3>
-          <p>Cena: 200 miodu</p>
-          <p>Blokuje 1 złą odpowiedź</p>
-          <button onclick="buyItem('shield')">Kup</button>
-        </div>
-
-        <div class="shop-item">
-          <h3>✨ Większa szansa na złotą odpowiedź</h3>
+          <h3>🍯 Stałe +5 startowego miodu</h3>
           <p>Cena: 250 miodu</p>
-          <p>+10% szansy</p>
-          <button onclick="buyItem('goldChance')">Kup</button>
+          <button onclick="buyPermanentUpgrade('startHoney')">Kup</button>
+        </div>
+
+        <div class="shop-item">
+          <h3>✨ +5% szansy na złotą odpowiedź</h3>
+          <p>Cena: 350 miodu</p>
+          <button onclick="buyPermanentUpgrade('goldChance')">Kup</button>
+        </div>
+
+        <div class="shop-item">
+          <h3>🛡 +1 tarcza na start</h3>
+          <p>Cena: 400 miodu</p>
+          <button onclick="buyPermanentUpgrade('startShield')">Kup</button>
+        </div>
+
+        <div class="shop-item">
+          <h3>💰 +1 miodu za dobrą odpowiedź</h3>
+          <p>Cena: 500 miodu</p>
+          <button onclick="buyPermanentUpgrade('answerBonus')">Kup</button>
+        </div>
+
+        <div class="shop-item">
+          <h3>🧱 -5% kar z kart</h3>
+          <p>Cena: 450 miodu</p>
+          <button onclick="buyPermanentUpgrade('damageReduce')">Kup</button>
         </div>
       </div>
 
-      <div class="panel" id="shopMessage">Kupuj ulepszenia za miód zdobyty w poprzednich grach.</div>
+      <div class="panel" id="shopMessage">Kupuj stałe ulepszenia i rozwijaj swój profil.</div>
 
       <div class="menu-buttons">
         <button id="backFromShopBtn">⬅ Wróć</button>
       </div>
     </section>
 
-    <!-- GRA -->
     <section id="gameScreen" class="screen">
       <h1>🍯 Miodowa Ortografia</h1>
 
       <div class="panel topbar">
-        <div>👤 Nick: <span id="playerDisplay">Brak</span></div>
-        <div>🍯 Miód: <span id="honey">0</span></div>
-        <div>❤️ Życia: <span id="lives">3</span></div>
-        <div>❓ Pytanie: <span id="questionNumber">1</span>/<span id="maxQuestions">50</span></div>
-        <div>📚 Etap: <span id="stageName">Ó / U</span></div>
-        <div>🛡 Tarcze: <span id="shields">0</span></div>
+        <div>👤 <span id="playerDisplay">Brak</span></div>
+        <div>🍯 <span id="honey">0</span></div>
+        <div>❤️ <span id="lives">3</span></div>
+        <div>🛡 <span id="shields">0</span></div>
+        <div>❓ <span id="questionNumber">1</span>/<span id="maxQuestions">50</span></div>
+        <div>📚 <span id="stageName">Ó / U</span></div>
       </div>
 
       <div class="panel">
-        <div class="progress-label">Postęp do kolejnego etapu</div>
+        <div class="progress-label">Postęp etapu</div>
         <div class="progress-bar">
           <div class="progress-fill" id="progressFill"></div>
         </div>
       </div>
 
-      <div class="event-bar panel">
-        <strong>Aktywny event:</strong> <span id="activeEvent">Brak</span>
-      </div>
-
-      <div class="pet-bar panel">
-        <strong>Zwierzątko:</strong> <span id="pet">Brak</span>
+      <div class="panel fancy-panel">
+        <div><strong>Event:</strong> <span id="activeEvent">Brak</span></div>
+        <div><strong>Zwierzątko:</strong> <span id="pet">Brak</span></div>
       </div>
 
       <div class="gold-box panel" id="goldBox" style="display:none;">
         <div class="gold-animate">✨ ZŁOTA ODPOWIEDŹ ✨</div>
-        <div>Jeśli odpowiesz dobrze, dostaniesz zwierzątko!</div>
+        <div>Odpowiedz dobrze, aby zdobyć specjalne zwierzątko!</div>
       </div>
 
       <div class="question-box panel">
@@ -129,10 +138,10 @@
       <div class="menu-buttons">
         <button id="nextBtn" style="display:none;">Następne pytanie</button>
         <button id="goLobbyBtn">🏆 Top 10</button>
+        <button id="muteBtnGame">🔊 Dźwięk: ON</button>
       </div>
     </section>
 
-    <!-- KONIEC -->
     <section id="gameOverScreen" class="screen">
       <h1>💀 Koniec gry</h1>
       <div class="panel">
@@ -146,7 +155,6 @@
       </div>
     </section>
 
-    <!-- ZWYCIĘSTWO -->
     <section id="winScreen" class="screen">
       <h1>👑 Zwycięstwo!</h1>
       <div class="panel">
